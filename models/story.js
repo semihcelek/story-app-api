@@ -9,18 +9,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Story.belongsTo(models.user);
+      models.story.belongsTo(models.user, { foreignKey: 'authorId' });
     }
   }
   Story.init({
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     title: DataTypes.STRING,
     content: {
       type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    authorId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
