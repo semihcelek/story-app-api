@@ -1,6 +1,6 @@
 const express = require('express');
 // const UserService = require('../services/user-service')
-const { user } = require('../models/index');
+const { user, story } = require('../models/index');
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.get('/all/json', async (req, res) => {
 });
 
 router.get('/:id/json', async (req, res) => {
-  const person = await user.findAll({
+  const person = await user.findOne({
     where: {
       id: req.params.id,
     },
@@ -22,6 +22,22 @@ router.get('/:id/json', async (req, res) => {
 router.post('/', async (req, res) => {
   const newUser = await user.create(req.body);
   res.send(newUser);
+});
+
+router.post('/:id/story', async (req, res) => {
+  const { id } = await user.findOne({
+    where: {
+      id: req.params.id,
+    },
+  });
+  const newStory = await story.create({
+    title: req.body.title,
+    content: req.body.content,
+    authorId: id,
+    userId: id,
+  });
+
+  res.send(newStory);
 });
 
 router.put('/:id', async (req, res) => {
@@ -44,3 +60,12 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+// router.post('/:id/story', async(req, res) => {
+//   const currentUserId = req.params.id;
+//   const newStory = await story.build(req.body)
+//   newStory.authorId= await currentUserId;
+//   newStory.userId= await currentUserId;
+//   await newStory.save()
+//   res.send(newStory);
+//   })
