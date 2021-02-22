@@ -1,4 +1,4 @@
-const { Model } = require('sequelize');
+const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -35,18 +35,15 @@ module.exports = (sequelize, DataTypes) => {
           isEmail: true,
         },
       },
-      password: {
+      passwordHash: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-          len: [6, 127],
-        },
       },
     },
     {
       sequelize,
-      modelName: 'user',
-    },
+      modelName: "user",
+    }
   );
 
   return User;
