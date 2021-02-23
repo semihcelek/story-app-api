@@ -3,8 +3,8 @@ const { user, story } = require("../models/index");
 const ensureLogin = require("../middleware/ensure-login");
 
 const router = express.Router();
-router.get("/*/json", ensureLogin);
-//
+// router.get("/*/json", ensureLogin);
+// require login for all /json endpoints
 
 router.get("/all/json", async (req, res) => {
   const people = await user.findAll();
@@ -12,63 +12,25 @@ router.get("/all/json", async (req, res) => {
   res.send(people);
 });
 
-router.get("/:id/json", async (req, res) => {
+router.get("/:id/json", ensureLogin, async (req, res) => {
   try {
     const person = await user.findOne({
       where: {
         id: req.params.id,
       },
     });
+    console.log(person);
     person ? res.send(person) : res.status(404).end();
     // when there isn't any user to send, response with status 404.
   } catch (err) {
-    console.error(err);
-    res.status(500);
+    console.log(err);
     //5xx server error status for internal error
   }
 });
 
-router.post("/", ensureLogin, async (req, res, next) => {
+router.put("/:id", ensureLogin, async (req, res) => {
+  const person = req.user;
   try {
-    const newUser = await user.create(req.body);
-    res.send(newUser);
-  } catch (err) {
-    res.status(500).end();
-    console.error(err);
-  }
-});
-
-router.post("/:id/story", async (req, res) => {
-  try {
-    const person = await user.findOne({
-      where: {
-        id: req.params.id,
-      },
-    });
-    if (person) {
-      const newStory = await story.create({
-        title: req.body.title,
-        content: req.body.content,
-        authorId: person.id,
-        userId: person.id,
-      });
-      res.send(newStory);
-    } else {
-      res.send("user is not found");
-      res.status(404).end();
-    }
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-router.put("/:id", async (req, res) => {
-  try {
-    const person = await user.findOne({
-      where: {
-        id: req.params.id,
-      },
-    });
     if (person) {
       const updateUser = await user.update(req.body, {
         where: {
@@ -85,7 +47,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", ensureLogin, async (req, res) => {
   try {
     const person = await user.findOne({
       where: {
@@ -111,6 +73,7 @@ router.delete("/:id", async (req, res) => {
 
 module.exports = router;
 
+// 2-staged creating method, not needed
 // router.post('/:id/story', async(req, res) => {
 //   const currentUserId = req.params.id;
 //   const newStory = await story.build(req.body)
@@ -119,3 +82,22 @@ module.exports = router;
 //   await newStory.save()
 //   res.send(newStory);
 //   })
+
+// Creating new user is not consern of user-route anymore,
+// it is moved to the register-route
+// router.post("/", async (req, res, next) => {
+//   try {
+//     const { firstName, lastName, email, password } = req.body;
+//     const passwordHash = await bcrypt.hash(password, 12);
+//     const newUser = await user.create({
+//       firstName: firstName,
+//       lastName: lastName,
+//       email: email,
+//       passwordHash: passwordHash,
+//     });
+//     res.send(newUser);
+//   } catch (err) {
+//     res.status(500).end();
+//     console.error(err);
+//   }
+// })
