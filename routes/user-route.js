@@ -7,7 +7,9 @@ const router = express.Router();
 // require login for all /json endpoints
 
 router.get("/all/json", async (req, res) => {
-  const people = await user.findAll();
+  const people = await user.findAll({
+    attributes: ["firstName", "lastName", "email"],
+  });
 
   res.send(people);
 });
@@ -15,6 +17,8 @@ router.get("/all/json", async (req, res) => {
 router.get("/:id/json", ensureLogin, async (req, res) => {
   try {
     const person = await user.findOne({
+      include: story,
+      attributes: { exclude: ["passwordHash"] }, // excluding passwordHash entity isn't necessary anymore.
       where: {
         id: req.params.id,
       },
