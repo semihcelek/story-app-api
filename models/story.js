@@ -1,4 +1,4 @@
-const { Model } = require('sequelize');
+const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class Story extends Model {
@@ -9,23 +9,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      models.story.belongsTo(models.user, { foreignKey: 'authorId' });
+      models.story.belongsTo(models.user, { foreignKey: "authorId" });
     }
   }
-  Story.init({
-    title: DataTypes.STRING,
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false,
+  Story.init(
+    {
+      title: DataTypes.STRING,
+      content: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
     },
-    authorId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'story',
-  });
+    {
+      sequelize,
+      modelName: "story",
+    }
+  );
   return Story;
 };
