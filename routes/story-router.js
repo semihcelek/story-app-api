@@ -1,12 +1,15 @@
 const express = require("express");
-const { story } = require("../models/index");
-const { ensureLogin } = require("../middleware/ensure-login");
+const { story, user } = require("../models/index");
+const ensureLogin = require("../middleware/ensure-login");
+const sequelize = require("sequelize");
 
 const router = express.Router();
 
 router.get("/all/json", async (req, res) => {
   try {
-    const post = await story.findAll();
+    const post = await story.findAll({
+      order: [["createdAt", "DESC"]],
+    });
     res.send(post);
   } catch (err) {
     console.error(err);
@@ -16,6 +19,7 @@ router.get("/all/json", async (req, res) => {
 router.get("/:id/json", async (req, res) => {
   try {
     const post = await story.findOne({
+      include: user,
       where: {
         id: req.params.id,
       },
@@ -25,6 +29,7 @@ router.get("/:id/json", async (req, res) => {
     console.error(err);
   }
 });
+
 router.post("/", ensureLogin, async (req, res, next) => {
   try {
     const person = req.user;
