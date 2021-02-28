@@ -8,7 +8,12 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
 
-  const userFromDb = await user.findOne({ where: { email: email } });
+  const userFromDb = await user.findOne({
+    attributes: {
+      include: ["passwordHash"],
+    },
+    where: { email: email },
+  });
   const passwordCorrect =
     userFromDb === null
       ? false
@@ -34,7 +39,12 @@ router.post("/", async (req, res) => {
 
   res
     .status(200)
-    .send({ token, email: userFromDb.email, firstName: userFromDb.firstName });
+    .send({
+      token,
+      id: userFromDb.id,
+      email: userFromDb.email,
+      firstName: userFromDb.firstName,
+    });
 });
 
 module.exports = router;
